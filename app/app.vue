@@ -208,7 +208,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 
     <v-snackbar 
       v-model="snackbar" 
-      :location="gameOver ? 'center' : 'top'" 
+      :location="gameOver ? 'center' : 'center top'" 
       :timeout="gameOver ? -1 : 3000" 
       color="#212121"
       elevation="24"
@@ -221,10 +221,11 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
       
         <v-btn 
           v-if="gameOver" 
-          class="play-again-btn mt-4 animate__animated animate__fadeInUp"
+          class="play-again-btn mt-4 px-10"
           variant="flat"
-          rounded="lg"
+          rounded="xl"
           size="large"
+          :ripple="{ class: 'text-white' }"
           @click="resetGame"
         >
           Play Again
@@ -334,18 +335,26 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .play-again-btn {
-  /* A deep, muted green that feels sophisticated */
-  background-color: #538d4e !important; 
+  background-color: #c4a6f8 !important; 
   color: white !important;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
   font-weight: 700 !important;
-  transition: transform 0.2s ease, background-color 0.2s ease !important;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  box-shadow: 0 4px 15px rgba(103, 58, 183, 0.3);
 }
 
 .play-again-btn:hover {
-  background-color: #6aaa64 !important;
-  transform: scale(1.05);
+  background-color: #a67ff5 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(103, 58, 183, 0.5);
+  letter-spacing: 2px;
+}
+
+.play-again-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(103, 58, 183, 0.2);
 }
 
 .game-over-snackbar :deep(.v-snackbar__content) {
