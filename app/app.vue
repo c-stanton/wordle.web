@@ -211,10 +211,10 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
       <v-snackbar
         v-model="hintSnackbar"
         location="top"
-        color="blue-grey-darken-4"
-        elevation="12"
+        elevation="24"
+        color="#212121"
         :timeout="5000"
-        class="game-over-snackbar" 
+        class="game-over-snackbar mini-box" 
       >
         <div class="d-flex align-center">
           <v-icon start color="white" size="24">mdi-information-outline</v-icon>
@@ -423,18 +423,17 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .game-over-snackbar :deep(.v-snackbar__content) {
-  padding: 24px !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 40px 24px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(76, 175, 80, 0.4) !important;
+  background: #121212 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7) !important;
 }
 
 .mini-box :deep(.v-snackbar__content) {
-  padding: 8px 16px !important;
+  padding: 12px 20px !important;
   width: auto !important;
-  min-width: 120px !important;
   max-width: fit-content !important;
-  border-radius: 8px !important;
-  margin-top: 10px;
 }
 
 .game-over-snackbar:not(.mini-box) :deep(.v-snackbar__content) {

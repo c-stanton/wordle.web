@@ -32,7 +32,7 @@ export const VALID_GUESSES = [
   'adieu', 'audio', 'raise', 'least', 'train', 'sleep', 'power', 'cloud', 'music', 'field', 
   'night', 'heart', 'light', 'point', 'earth', 'bread', 'table', 'smile', 'water', 'plant',
   'apple', 'grape', 'house', 'piano', 'ocean', 'flame', 'brain', 'juice', 'cocoa', 'river',
-  'mummy', 'zebra', 'goose'
+  'mummy', 'zebra', 'goose', 'fruit'
 ];
 
 export const getRandomWord = () => {
