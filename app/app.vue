@@ -112,7 +112,7 @@ const checkWord = () => {
     snackbar.value = true
   } else if (currentRow.value === 5) {
     gameOver.value = true
-    snackbarMsg.value = `👎The word was ${solution.value}. 👎`
+    snackbarMsg.value = `💔 The word was ${solution.value}. 💔`
     snackbar.value = true
   } else {
     currentRow.value++
@@ -210,26 +210,26 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
       v-model="snackbar" 
       :location="gameOver ? 'center' : 'top'" 
       :timeout="gameOver ? -1 : 3000" 
-      color="grey-darken-4"
+      color="#212121"
       elevation="24"
-      :vertical="gameOver"
+      class="game-over-snackbar"
     >
-      <div class="text-center font-weight-bold text-h6" :class="{ 'mb-4 mt-2': gameOver }">
-        {{ snackbarMsg }}
-      </div>
+      <div class="d-flex flex-column align-center pa-2">
+        <div class="text-center font-weight-bold text-h6 mb-6">
+          {{ snackbarMsg }}
+        </div>
       
-      <template v-slot:actions>
         <v-btn 
           v-if="gameOver" 
-          color="primary" 
-          variant="elevated" 
-          block
+          class="play-again-btn mt-4 animate__animated animate__fadeInUp"
+          variant="flat"
+          rounded="lg"
           size="large"
           @click="resetGame"
         >
           Play Again
         </v-btn>
-      </template>
+      </div>
     </v-snackbar>
   </v-app>
 </template>
@@ -331,5 +331,26 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   background: rgba(18, 18, 18, 0.5);
   backdrop-filter: blur(12px) brightness(0.8);
   -webkit-backdrop-filter: blur(12px) brightness(0.8);
+}
+
+.play-again-btn {
+  /* A deep, muted green that feels sophisticated */
+  background-color: #538d4e !important; 
+  color: white !important;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700 !important;
+  transition: transform 0.2s ease, background-color 0.2s ease !important;
+}
+
+.play-again-btn:hover {
+  background-color: #6aaa64 !important;
+  transform: scale(1.05);
+}
+
+.game-over-snackbar :deep(.v-snackbar__content) {
+  padding: 24px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style>
