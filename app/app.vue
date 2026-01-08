@@ -160,9 +160,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 <template>
   <v-app>
     <v-app-bar flat border>
-      <v-app-bar-title class="wordle-title ml-4">
-        Wordle
-      </v-app-bar-title>
+      <v-app-bar-title class="wordle-title ml-4">Wordle</v-app-bar-title>
       <v-spacer></v-spacer>
       <client-only>
         <v-btn :icon="themeIcon" @click="toggleTheme" @mousedown.prevent></v-btn>
@@ -170,37 +168,49 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
       <v-btn icon="mdi-restart" @click="resetGame" @mousedown.prevent></v-btn>
     </v-app-bar>
 
-    <v-main style="position: relative;">
-      <div 
-        style="position: relative; min-height: calc(100vh - 64px); background-color: inherit;"
-        :style="gameOver ? 'pointer-events: none; user-select: none;' : ''"
-      >
-        <v-container class="py-8">
-          <div style="max-width: 330px; margin: 0 auto;">
-            <v-row v-for="(row, i) in board" :key="i" justify="center" no-gutters style="gap: 8px;" class="mb-2">
-              <v-col v-for="(cell, j) in row" :key="j" cols="auto">
-                <v-sheet height="58" width="58" class="tile-sheet" :class="{ 'tile-active': cell.letter !== '', 'tile-flip': cell.status !== 'default' }" elevation="0" :style="{ transitionDelay: cell.status !== 'default' ? `${j * 150}ms` : '0ms' }">
-                  <div class="tile-inner">
-                    <div class="tile-front d-flex align-center justify-center text-h4 font-weight-bold">{{ cell.letter }}</div>
-                    <div class="tile-back d-flex align-center justify-center text-h4 font-weight-bold text-white" :class="cell.status">{{ cell.letter }}</div>
-                  </div>
-                </v-sheet>
-              </v-col>
-            </v-row>
-          </div>
-        </v-container>
+    <v-main class="d-flex flex-column" style="height: calc(100vh - 64px); overflow: hidden;">
+      <v-spacer></v-spacer>
 
-        <v-container style="max-width: 600px;" class="pb-8">
-          <v-row v-for="(row, i) in rows" :key="i" justify="center" dense>
-            <v-col v-for="key in row" :key="key" cols="auto" class="pa-1">
-              <v-btn :min-width="key.length > 1 ? '65' : '40'" height="58" class="text-caption font-weight-bold px-2" :class="{ 'text-white': letterStates[key] }" :color="letterStates[key] === 'correct' ? 'green' : letterStates[key] === 'present' ? 'yellow-darken-2' : letterStates[key] === 'absent' ? 'grey-darken-4' : 'grey-darken-2'" @click="handleInput(key)" @mousedown.prevent>
-                <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="20"></v-icon></template>
-                <template v-else>{{ key }}</template>
-              </v-btn>
+      <v-container class="py-2">
+        <div class="board-wrapper">
+          <v-row v-for="(row, i) in board" :key="i" justify="center" no-gutters class="board-row mb-2" style="gap: 8px;">
+            <v-col v-for="(cell, j) in row" :key="j" cols="auto">
+              <v-sheet class="tile-sheet" :class="{ 'tile-active': cell.letter !== '', 'tile-flip': cell.status !== 'default' }" elevation="0" :style="{ transitionDelay: cell.status !== 'default' ? `${j * 150}ms` : '0ms' }">
+                <div class="tile-inner">
+                  <div class="tile-front d-flex align-center justify-center font-weight-bold">{{ cell.letter }}</div>
+                  <div class="tile-back d-flex align-center justify-center font-weight-bold text-white" :class="cell.status">{{ cell.letter }}</div>
+                </div>
+              </v-sheet>
             </v-col>
           </v-row>
-        </v-container>
-      </div>
+        </div>
+      </v-container>
+
+      <v-spacer></v-spacer>
+
+      <v-container class="keyboard-container pb-8 px-1">
+        <div v-for="(row, i) in rows" :key="i" class="keyboard-row">
+          <div 
+            v-for="key in row" 
+            :key="key" 
+            class="key-wrapper"
+            :class="{ 'wide-wrapper': key.length > 1 }"
+          >
+            <v-btn 
+              block
+              class="keyboard-btn font-weight-bold" 
+              :class="{ 'text-white': letterStates[key] }" 
+              :color="letterStates[key] === 'correct' ? 'green' : letterStates[key] === 'present' ? 'yellow-darken-2' : letterStates[key] === 'absent' ? 'grey-darken-4' : 'grey-darken-2'" 
+              @click="handleInput(key)" 
+              @mousedown.prevent
+            >
+              <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="16"></v-icon></template>
+              <template v-else>{{ key }}</template>
+            </v-btn>
+          </div>
+        </div>
+      </v-container>
+
       <v-fade-transition>
         <div v-if="gameOver" class="glass-overlay"></div>
       </v-fade-transition>
@@ -208,24 +218,22 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 
     <v-snackbar 
       v-model="snackbar" 
-      :location="gameOver ? 'center' : 'center top'" 
+      location="center" 
       :timeout="gameOver ? -1 : 3000" 
       color="#212121"
       elevation="24"
       class="game-over-snackbar"
     >
       <div class="d-flex flex-column align-center pa-2">
-        <div class="text-center font-weight-bold text-h6 mb-6">
+        <div class="text-center font-weight-bold text-h6 mb-4">
           {{ snackbarMsg }}
         </div>
-      
         <v-btn 
           v-if="gameOver" 
-          class="play-again-btn mt-4 px-10"
+          class="play-again-btn px-10"
           variant="flat"
           rounded="xl"
           size="large"
-          :ripple="{ class: 'text-white' }"
           @click="resetGame"
         >
           Play Again
@@ -256,6 +264,8 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   perspective: 1000px;
   background: transparent !important;
   border: none !important;
+  width: 58px;
+  height: 58px;
 }
 
 .tile-inner {
@@ -280,7 +290,6 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Libre Franklin', sans-serif !important;
 }
 
 .tile-front {
@@ -299,30 +308,17 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   transform: rotateX(180deg);
 }
 
-/* Colors */
-.correct { 
-  background-color: #4caf50; 
-}
-
-.present { 
-  background-color: #fbc02d; 
-}
-
-.absent  { 
-  background-color: #424242; 
-}
+/* --- Wordle Colors --- */
+.correct { background-color: #4caf50; }
+.present { background-color: #fbc02d; }
+.absent  { background-color: #424242; }
 
 .glass-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 5;
-  
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
   background: rgba(255, 255, 255, 0.3);
   pointer-events: none;
   transition: opacity 0.6s ease;
@@ -342,23 +338,99 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   text-transform: uppercase;
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  box-shadow: 0 4px 15px rgba(103, 58, 183, 0.3);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
 .play-again-btn:hover {
-  background-color: rgb(76, 175, 80) !important;
+  background-color: rgb(67, 160, 71) !important;
   transform: translateY(-2px);
   letter-spacing: 2px;
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
 .play-again-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 10px rgba(76, 183, 58, 0.3);
+  box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
 }
 
 .game-over-snackbar :deep(.v-snackbar__content) {
   padding: 24px !important;
   border-radius: 12px !important;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- Desktop & Mobile Shared Base --- */
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px; /* Essential for Desktop */
+  margin: 0 auto 8px auto !important;
+  touch-action: none;
+}
+
+.key-wrapper {
+  /* Default Desktop Width */
+  flex: 0 0 44px; 
+  height: 58px;
+  margin: 0 3px;
+}
+
+.wide-wrapper {
+  flex: 0 0 65px; /* Enter/Backspace size */
+}
+
+.keyboard-btn {
+  height: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  text-transform: uppercase;
+}
+
+/* --- Mobile Fix --- */
+@media (max-width: 600px) {
+  .keyboard-row {
+    max-width: 100%;
+    margin-bottom: 5px !important;
+    padding: 0 2px;
+  }
+
+  .key-wrapper {
+    /* Magic Math: 10% width minus the 2px margin */
+    flex: 1 1 calc(10% - 2px) !important;
+    margin: 0 1px !important;
+    height: 45px;
+  }
+
+  .wide-wrapper {
+    /* Enter/Backspace take up 1.5x the space of a letter */
+    flex: 1.5 1 0 !important;
+  }
+
+  .keyboard-btn {
+    font-size: 0.70rem !important;
+  }
+}
+
+/* iOS Home Bar spacing */
+.pb-8 {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom)) !important;
+}
+
+.game-over-snackbar :deep(.v-snackbar__content) {
+  padding: 40px 24px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(76, 175, 80, 0.4) !important;
+  background: #121212 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7) !important;
+  max-width: 90vw !important;
+  width: 340px !important;
+}
+
+.text-overline {
+  font-family: 'Libre Franklin', sans-serif !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
 }
 </style>
