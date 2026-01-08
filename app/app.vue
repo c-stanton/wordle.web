@@ -335,7 +335,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .play-again-btn {
-  background-color: #453069 !important; 
+  background-color: #4caf50 !important; 
   color: white !important;
   font-weight: 700 !important;
   letter-spacing: 1.2px;
@@ -346,7 +346,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .play-again-btn:hover {
-  background-color: #7551bd !important;
+  background-color: #429745 !important;
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(103, 58, 183, 0.5);
   letter-spacing: 2px;
