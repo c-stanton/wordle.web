@@ -255,12 +255,12 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 
 <style>
 .wordle-title {
-  font-family: 'Fredericka the Great', serif !important;
-  text-transform: uppercase !important;
-  font-size: 3rem !important; 
-  letter-spacing: 2px !important;
+  font-family: 'Grand Hotel', cursive !important;
+  text-transform: none !important; 
+  font-size: 3.2rem !important;   
+  letter-spacing: 0.5px !important;
   line-height: 1 !important;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+  font-weight: 400 !important;
 }
 
 .v-application,

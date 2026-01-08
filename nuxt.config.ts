@@ -4,7 +4,7 @@ export default defineNuxtConfig({
       link: [
         { 
           rel: 'stylesheet', 
-          href: 'https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&family=Fredericka+the+Great&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@700&family=Grand+Hotel&display=swap'
         }
       ]
     }
