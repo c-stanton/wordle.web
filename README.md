@@ -1,1 +1,1 @@
-My version of Wordle that has tile flipping, color coding, and a small contained word list.
+My version of Wordle that has light/dark mode, tile flipping, color coding, and a small word bank.
