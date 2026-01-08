@@ -1,14 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useTheme } from 'vuetify'
-import { getRandomWord, VALID_GUESSES } from './utils/wordlist'
+import { getRandomWord } from './utils/wordlist'
 
 // <><><><> Toggle Theme <><><><>
 const theme = useTheme()
-
-const themeIcon = computed(() => {
-  return theme.global.name.value === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night'
-})
+const themeIcon = computed(() => theme.global.name.value === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night')
 
 function toggleTheme() {
   const isDark = theme.global.name.value === 'dark'
@@ -17,13 +14,12 @@ function toggleTheme() {
   localStorage.setItem('user-theme', newTheme)
 }
 
-// <><><><> Board State <><><><>
-const solution = ref(getRandomWord())
-const board = ref(
-  Array.from({ length: 6 }, () => 
-    Array.from({ length: 5 }, () => ({ letter: '', status: 'default' }))
-  )
-)
+// <><><><> Game State <><><><>
+const currentWordData = ref(getRandomWord())
+const solution = computed(() => currentWordData.value.word.toUpperCase())
+const currentHint = computed(() => currentWordData.value.hint)
+
+const board = ref(Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => ({ letter: '', status: 'default' }))))
 const currentRow = ref(0)
 const currentCol = ref(0)
 const gameOver = ref(false)
@@ -32,6 +28,7 @@ const letterStates = ref({})
 // <><><><> UI State <><><><>
 const snackbar = ref(false)
 const snackbarMsg = ref('')
+const hintSnackbar = ref(false)
 
 const rows = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -41,15 +38,14 @@ const rows = [
 
 // <><><><> Game Logic <><><><>
 const resetGame = () => {
-  solution.value = getRandomWord()
-  board.value = Array.from({ length: 6 }, () => 
-    Array.from({ length: 5 }, () => ({ letter: '', status: 'default' }))
-  )
+  currentWordData.value = getRandomWord()
+  board.value = Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => ({ letter: '', status: 'default' })))
   letterStates.value = {}
   currentRow.value = 0
   currentCol.value = 0
   gameOver.value = false
   snackbar.value = false
+  hintSnackbar.value = false
 }
 
 const checkWord = () => {
@@ -132,7 +128,18 @@ const handleInput = (e) => {
   const key = (typeof e === 'string' ? e : e.key).toUpperCase()
   
   if (key === 'ENTER') {
-    if (currentCol.value === 5) checkWord()
+    if (currentCol.value === 5) {
+      const guessString = board.value[currentRow.value].map(cell => cell.letter).join('').toLowerCase()
+      const isAnswer = WORD_LIST.some(item => item.word.toLowerCase() === guessString);
+      const isDictionaryWord = VALID_GUESSES.includes(guessString);
+
+      if (isAnswer || isDictionaryWord) {
+        checkWord()
+      } else {
+        showTemporaryMessage('Not in word list')
+        shakeRow()
+      }
+    }
   } else if (key === 'BACKSPACE' || key === 'DELETE') {
     if (currentCol.value > 0) {
       currentCol.value--
@@ -142,6 +149,24 @@ const handleInput = (e) => {
     board.value[currentRow.value][currentCol.value].letter = key
     currentCol.value++
   }
+}
+
+const showTemporaryMessage = (message) => {
+  snackbarMsg.value = message
+  snackbar.value = true
+  if (!gameOver.value) {
+    setTimeout(() => {
+      if (!gameOver.value) snackbar.value = false
+    }, 2000)
+  }
+}
+
+const shakeActive = ref(false)
+const shakeRow = () => {
+  shakeActive.value = true
+  setTimeout(() => {
+    shakeActive.value = false
+  }, 500)
 }
 
 // <><><><> Event Listeners <><><><>
@@ -159,21 +184,59 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 
 <template>
   <v-app>
-    <v-app-bar flat border>
-      <v-app-bar-title class="wordle-title ml-4">Wordle</v-app-bar-title>
+    <v-app-bar flat border px-2>
+      <v-app-bar-title class="wordle-title ml-2 ml-sm-4">Wordle</v-app-bar-title>
+      
       <v-spacer></v-spacer>
-      <client-only>
-        <v-btn :icon="themeIcon" @click="toggleTheme" @mousedown.prevent></v-btn>
-      </client-only>
-      <v-btn icon="mdi-restart" @click="resetGame" @mousedown.prevent></v-btn>
+
+      <div class="d-flex align-center flex-nowrap">
+        <v-btn 
+          icon="mdi-lightbulb-on-outline"
+          @click="hintSnackbar = true" 
+          :disabled="gameOver"
+          @mousedown.prevent
+        ></v-btn>
+
+        <client-only>
+          <v-btn :icon="themeIcon" @click="toggleTheme" @mousedown.prevent></v-btn>
+        </client-only>
+
+        <v-btn icon="mdi-restart" @click="resetGame" @mousedown.prevent></v-btn>
+      </div>
     </v-app-bar>
 
     <v-main class="d-flex flex-column" style="height: calc(100vh - 64px); overflow: hidden;">
       <v-spacer></v-spacer>
 
+      <v-snackbar
+        v-model="hintSnackbar"
+        location="top"
+        color="blue-grey-darken-4"
+        elevation="12"
+        :timeout="5000"
+        class="game-over-snackbar" 
+      >
+        <div class="d-flex align-center">
+          <v-icon start color="white" size="24">mdi-information-outline</v-icon>
+          <span class="text-body-2">{{ currentHint }}</span>
+        </div>
+        
+        <template v-slot:actions>
+          <v-btn 
+            class="play-again-btn mr-2" 
+            variant="flat"
+            rounded="xl"
+            size="small"
+            @click="hintSnackbar = false"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+
       <v-container class="py-2">
         <div class="board-wrapper">
-          <v-row v-for="(row, i) in board" :key="i" justify="center" no-gutters class="board-row mb-2" style="gap: 8px;">
+          <v-row v-for="(row, i) in board" :key="i" justify="center" :class="{ 'shake': shakeActive && i === currentRow }"class="board-row mb-2" no-gutters style="gap: 8px;">
             <v-col v-for="(cell, j) in row" :key="j" cols="auto">
               <v-sheet class="tile-sheet" :class="{ 'tile-active': cell.letter !== '', 'tile-flip': cell.status !== 'default' }" elevation="0" :style="{ transitionDelay: cell.status !== 'default' ? `${j * 150}ms` : '0ms' }">
                 <div class="tile-inner">
@@ -218,19 +281,20 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 
     <v-snackbar 
       v-model="snackbar" 
-      location="center" 
-      :timeout="gameOver ? -1 : 3000" 
-      color="#212121"
+      :location="gameOver ? 'center' : 'top'" 
+      :timeout="gameOver ? -1 : 1500" 
+      :color="gameOver ? '#212121' : 'grey-darken-3'"
       elevation="24"
-      class="game-over-snackbar"
+      :class="['game-over-snackbar', { 'mini-box': !gameOver }]"
     >
-      <div class="d-flex flex-column align-center pa-2">
-        <div class="text-center font-weight-bold text-h6 mb-4">
+      <div class="d-flex flex-column align-center pa-1">
+        <div :class="[gameOver ? 'text-h6 font-weight-bold' : 'text-body-2 font-weight-medium']" class="text-center">
           {{ snackbarMsg }}
         </div>
+
         <v-btn 
           v-if="gameOver" 
-          class="play-again-btn px-10"
+          class="play-again-btn px-10 mt-4"
           variant="flat"
           rounded="xl"
           size="large"
@@ -359,6 +423,21 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.mini-box :deep(.v-snackbar__content) {
+  padding: 8px 16px !important;
+  width: auto !important;
+  min-width: 120px !important;
+  max-width: fit-content !important;
+  border-radius: 8px !important;
+  margin-top: 10px;
+}
+
+.game-over-snackbar:not(.mini-box) :deep(.v-snackbar__content) {
+  padding: 40px 24px !important;
+  width: 340px !important;
+  border-radius: 24px !important;
+}
+
 /* <><><><> Desktop Settings <><><><> */
 .keyboard-row {
   display: flex;
@@ -408,6 +487,16 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   .keyboard-btn {
     font-size: 0.70rem !important;
   }
+
+  .wordle-title {
+    font-size: 2.2rem !important; 
+    margin-left: 8px !important;
+  }
+
+  .v-app-bar .v-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
 }
 
 /* iOS Home Bar spacing */
@@ -429,5 +518,16 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   font-family: 'Libre Franklin', sans-serif !important;
   font-size: 0.75rem !important;
   text-transform: uppercase;
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 </style>

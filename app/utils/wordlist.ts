@@ -1,4 +1,4 @@
-export const VALID_GUESSES = [
+export const WORD_LIST = [
   { word: 'apple', hint: 'A round fruit that can be red, green, or yellow and is picked around fall.' },
   { word: 'bread', hint: 'A baked good that can be made at home or bought.' },
   { word: 'cloud', hint: 'Water vapor that floats in the sky.' },
@@ -21,6 +21,20 @@ export const VALID_GUESSES = [
   { word: 'zebra', hint: 'A horse with black-and-white stripes.' }
 ];
 
+export const VALID_GUESSES = [
+  'stare', 'crane', 'slate', 'brave', 'plane', 'blame', 'glare', 'pride', 'grime', 'route',
+  'shine', 'charm', 'flair', 'glide', 'brisk', 'climb', 'sling', 'trice', 'whale', 'zesty',
+  'quilt', 'vigor', 'waltz', 'xenon', 'yacht', 'zonal', 'adobe', 'baker', 'cider', 'drape',
+  'eagle', 'fable', 'gamer', 'hiker', 'ivory', 'jolly', 'kneel', 'lunar', 'mango', 'noble',
+  'oasis', 'quark', 'raven', 'salad', 'tiger', 'ultra', 'vivid', 'woven', 'yodel', 'abide', 
+  'bloom', 'chase', 'daisy', 'eager', 'frost', 'grace', 'haste', 'image', 'jewel', 'lemon', 
+  'novel', 'opera', 'quest', 'rally', 'sugar', 'tulip', 'unity', 'vapor', 'witty', 'count',
+  'adieu', 'audio', 'raise', 'least', 'train', 'sleep', 'power', 'cloud', 'music', 'field', 
+  'night', 'heart', 'light', 'point', 'earth', 'bread', 'table', 'smile', 'water', 'plant',
+  'apple', 'grape', 'house', 'piano', 'ocean', 'flame', 'brain', 'juice', 'cocoa', 'river',
+  'mummy', 'zebra', 'goose'
+];
+
 export const getRandomWord = () => {
-  return VALID_GUESSES[Math.floor(Math.random() * VALID_GUESSES.length)]
+  return WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]
 }
