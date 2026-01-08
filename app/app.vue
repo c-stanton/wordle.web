@@ -160,94 +160,75 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 <template>
   <v-app>
     <v-app-bar flat border>
-      <v-app-bar-title class="wordle-title ml-5">
+      <v-app-bar-title class="wordle-title ml-4">
         Wordle
       </v-app-bar-title>
       <v-spacer></v-spacer>
       <client-only>
-        <v-btn 
-          :icon="themeIcon" 
-          @click="toggleTheme" 
-          @mousedown.prevent
-        ></v-btn>
+        <v-btn :icon="themeIcon" @click="toggleTheme" @mousedown.prevent></v-btn>
       </client-only>
-      <v-btn 
-        icon="mdi-restart"
-        @click="resetGame"
-        @mousedown.prevent
-      ></v-btn>
+      <v-btn icon="mdi-restart" @click="resetGame" @mousedown.prevent></v-btn>
     </v-app-bar>
 
-    <v-main>
-      <v-container class="py-8">
-        <div style="max-width: 330px; margin: 0 auto;">
-          <v-row 
-            v-for="(row, i) in board" 
-            :key="i" 
-            justify="center" 
-            no-gutters 
-            style="gap: 8px;" 
-            class="mb-2"
-          >
-            <v-col 
-              v-for="(cell, j) in row" 
-              :key="j" 
-              cols="auto"
-            >
-              <v-sheet
-                height="58"
-                width="58"
-                class="tile-sheet"
-                :class="{ 
-                  'tile-active': cell.letter !== '',
-                  'tile-flip': cell.status !== 'default' 
-                }"
-                elevation="0"
-                :style="{ transitionDelay: cell.status !== 'default' ? `${j * 150}ms` : '0ms' }"
-              >
-                <div class="tile-inner">
-                  <div class="tile-front d-flex align-center justify-center text-h4 font-weight-bold">
-                    {{ cell.letter }}
+    <v-main style="position: relative;">
+      <div 
+        style="position: relative; min-height: calc(100vh - 64px); background-color: inherit;"
+        :style="gameOver ? 'pointer-events: none; user-select: none;' : ''"
+      >
+        <v-container class="py-8">
+          <div style="max-width: 330px; margin: 0 auto;">
+            <v-row v-for="(row, i) in board" :key="i" justify="center" no-gutters style="gap: 8px;" class="mb-2">
+              <v-col v-for="(cell, j) in row" :key="j" cols="auto">
+                <v-sheet height="58" width="58" class="tile-sheet" :class="{ 'tile-active': cell.letter !== '', 'tile-flip': cell.status !== 'default' }" elevation="0" :style="{ transitionDelay: cell.status !== 'default' ? `${j * 150}ms` : '0ms' }">
+                  <div class="tile-inner">
+                    <div class="tile-front d-flex align-center justify-center text-h4 font-weight-bold">{{ cell.letter }}</div>
+                    <div class="tile-back d-flex align-center justify-center text-h4 font-weight-bold text-white" :class="cell.status">{{ cell.letter }}</div>
                   </div>
-                  <div 
-                    class="tile-back d-flex align-center justify-center text-h4 font-weight-bold text-white"
-                    :class="cell.status"
-                  >
-                    {{ cell.letter }}
-                  </div>
-                </div>
-              </v-sheet>
+                </v-sheet>
+              </v-col>
+            </v-row>
+          </div>
+        </v-container>
+
+        <v-container style="max-width: 600px;" class="pb-8">
+          <v-row v-for="(row, i) in rows" :key="i" justify="center" dense>
+            <v-col v-for="key in row" :key="key" cols="auto" class="pa-1">
+              <v-btn :min-width="key.length > 1 ? '65' : '40'" height="58" class="text-caption font-weight-bold px-2" :class="{ 'text-white': letterStates[key] }" :color="letterStates[key] === 'correct' ? 'green' : letterStates[key] === 'present' ? 'yellow-darken-2' : letterStates[key] === 'absent' ? 'grey-darken-4' : 'grey-darken-2'" @click="handleInput(key)" @mousedown.prevent>
+                <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="20"></v-icon></template>
+                <template v-else>{{ key }}</template>
+              </v-btn>
             </v-col>
           </v-row>
-        </div>
-      </v-container>
-
-      <v-container style="max-width: 600px;">
-        <v-row v-for="(row, i) in rows" :key="i" justify="center" dense>
-          <v-col v-for="key in row" :key="key" cols="auto" class="pa-1">
-            <v-btn
-              :min-width="key.length > 1 ? '65' : '40'"
-              height="58"
-              class="text-caption font-weight-bold px-2"
-              :class="{ 'text-white': letterStates[key] }" 
-              :color="letterStates[key] === 'correct' ? 'green' : letterStates[key] === 'present' ? 'yellow-darken-2' : letterStates[key] === 'absent' ? 'grey-darken-4' : 'grey-darken-2'"
-              @click="handleInput(key)"
-              @mousedown.prevent
-            >
-              <template v-if="key === 'BACKSPACE'">
-                <v-icon icon="mdi-backspace-outline" size="20"></v-icon>
-              </template>
-              <template v-else>{{ key }}</template>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+        </v-container>
+      </div>
+      <v-fade-transition>
+        <div v-if="gameOver" class="glass-overlay"></div>
+      </v-fade-transition>
     </v-main>
 
-    <v-snackbar v-model="snackbar" location="top" :timeout="gameOver ? -1 : 3000" color="grey-darken-4">
-      <div class="text-center font-weight-bold mb-2">{{ snackbarMsg }}</div>
-      <template v-if="gameOver" v-slot:actions>
-        <v-btn color="primary" variant="elevated" @click="resetGame">New Game</v-btn>
+    <v-snackbar 
+      v-model="snackbar" 
+      :location="gameOver ? 'center' : 'top'" 
+      :timeout="gameOver ? -1 : 3000" 
+      color="grey-darken-4"
+      elevation="24"
+      :vertical="gameOver"
+    >
+      <div class="text-center font-weight-bold text-h6" :class="{ 'mb-4 mt-2': gameOver }">
+        {{ snackbarMsg }}
+      </div>
+      
+      <template v-slot:actions>
+        <v-btn 
+          v-if="gameOver" 
+          color="primary" 
+          variant="elevated" 
+          block
+          size="large"
+          @click="resetGame"
+        >
+          Play Again
+        </v-btn>
       </template>
     </v-snackbar>
   </v-app>
@@ -318,7 +299,37 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 /* Colors */
-.correct { background-color: #4caf50; }
-.present { background-color: #fbc02d; }
-.absent  { background-color: #424242; }
+.correct { 
+  background-color: #4caf50; 
+}
+
+.present { 
+  background-color: #fbc02d; 
+}
+
+.absent  { 
+  background-color: #424242; 
+}
+
+.glass-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.v-theme--dark .glass-overlay {
+  background: rgba(18, 18, 18, 0.5);
+  backdrop-filter: blur(12px) brightness(0.8);
+  -webkit-backdrop-filter: blur(12px) brightness(0.8);
+}
 </style>
