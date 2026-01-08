@@ -160,7 +160,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 <template>
   <v-app>
     <v-app-bar flat border>
-      <v-app-bar-title class="wordle-title ml-4">
+      <v-app-bar-title class="wordle-title ml-5">
         Wordle
       </v-app-bar-title>
       <v-spacer></v-spacer>
