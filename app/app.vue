@@ -267,7 +267,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
               @click="handleInput(key)" 
               @mousedown.prevent
             >
-              <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="20"></v-icon></template>
+              <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" class="backspace-icon"></v-icon></template>
               <template v-else>{{ key }}</template>
             </v-btn>
           </div>
@@ -308,6 +308,8 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 </template>
 
 <style>
+
+/* <><><><> Fonts <><><><> */
 .wordle-title {
   font-family: 'Grand Hotel', cursive !important;
   text-transform: none !important; 
@@ -340,6 +342,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   transform-style: preserve-3d;
 }
 
+/* <><><><> Flip Animation <><><><>*/
 .tile-flip .tile-inner {
   transform: rotateX(180deg);
 }
@@ -377,6 +380,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 .present { background-color: #fbc02d; }
 .absent  { background-color: #424242; }
 
+/* <><><><> Glass Overlay <><><><> */
 .glass-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -394,6 +398,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   -webkit-backdrop-filter: blur(12px) brightness(0.8);
 }
 
+/* <><><><> Snackbar & Button Styles <><><><> */
 .play-again-btn {
   background-color: rgb(76, 175, 80) !important; 
   color: white !important;
@@ -499,11 +504,12 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   }
 }
 
-/* iOS Home Bar spacing */
+/* <><><><> iOS Home Bar spacing <><><><> */
 .pb-8 {
     padding-bottom: calc(32px + env(safe-area-inset-bottom)) !important;
 }
 
+/* <><><><> Snackbar Enhanced Styles <><><><> */
 .game-over-snackbar :deep(.v-snackbar__content) {
   padding: 40px 24px !important;
   border-radius: 24px !important;
@@ -520,6 +526,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   text-transform: uppercase;
 }
 
+/* <><><><> Shake Animation <><><><> */
 .shake {
   animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
@@ -529,5 +536,27 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   20%, 80% { transform: translate3d(2px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* <><><><> Backspace Icon Adjustments <><><><> */
+.wide-wrapper .v-btn {
+  padding: 0 4px !important;
+}
+
+.backspace-icon {
+  font-size: 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .backspace-icon {
+    font-size: 16px !important;
+  }
+
+  .wide-wrapper {
+    flex: 1.8 1 0 !important;
+  }
 }
 </style>
