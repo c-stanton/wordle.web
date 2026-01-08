@@ -1,1 +1,1 @@
-My version of a Wordle-like project that has light/dark mode, tile flipping, color coding, and a small word bank. Made using Vue, css, and Nuxt.
+My version of a Wordle-like project that has light/dark mode, tile flipping, color coding, a small word bank with hints, and other features. Made using Vue, css, and Nuxt. You can play with it (here)[https://wordle.wrigglyt.xyz/].
