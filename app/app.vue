@@ -204,7 +204,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
               @click="handleInput(key)" 
               @mousedown.prevent
             >
-              <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="16"></v-icon></template>
+              <template v-if="key === 'BACKSPACE'"><v-icon icon="mdi-backspace-outline" size="20"></v-icon></template>
               <template v-else>{{ key }}</template>
             </v-btn>
           </div>
@@ -308,7 +308,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   transform: rotateX(180deg);
 }
 
-/* --- Wordle Colors --- */
+/* <><><><> Wordle Colors <><><><> */
 .correct { background-color: #4caf50; }
 .present { background-color: #fbc02d; }
 .absent  { background-color: #424242; }
@@ -359,25 +359,24 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* --- Desktop & Mobile Shared Base --- */
+/* <><><><> Desktop Settings <><><><> */
 .keyboard-row {
   display: flex;
   justify-content: center;
   width: 100%;
-  max-width: 500px; /* Essential for Desktop */
+  max-width: 500px;
   margin: 0 auto 8px auto !important;
   touch-action: none;
 }
 
 .key-wrapper {
-  /* Default Desktop Width */
   flex: 0 0 44px; 
   height: 58px;
   margin: 0 3px;
 }
 
 .wide-wrapper {
-  flex: 0 0 65px; /* Enter/Backspace size */
+  flex: 0 0 65px;
 }
 
 .keyboard-btn {
@@ -388,7 +387,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   text-transform: uppercase;
 }
 
-/* --- Mobile Fix --- */
+/* <><><><> Mobile Settings <><><><> */
 @media (max-width: 600px) {
   .keyboard-row {
     max-width: 100%;
@@ -397,14 +396,12 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
   }
 
   .key-wrapper {
-    /* Magic Math: 10% width minus the 2px margin */
     flex: 1 1 calc(10% - 2px) !important;
     margin: 0 1px !important;
     height: 45px;
   }
 
   .wide-wrapper {
-    /* Enter/Backspace take up 1.5x the space of a letter */
     flex: 1.5 1 0 !important;
   }
 
