@@ -335,7 +335,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .play-again-btn {
-  background-color: #4caf50 !important; 
+  background-color: rgb(76, 175, 80) !important; 
   color: white !important;
   font-weight: 700 !important;
   letter-spacing: 1.2px;
@@ -346,15 +346,14 @@ onUnmounted(() => window.removeEventListener('keydown', handleInput))
 }
 
 .play-again-btn:hover {
-  background-color: #429745 !important;
+  background-color: rgb(76, 175, 80) !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(103, 58, 183, 0.5);
   letter-spacing: 2px;
 }
 
 .play-again-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 10px rgba(103, 58, 183, 0.2);
+  box-shadow: 0 2px 10px rgba(76, 183, 58, 0.3);
 }
 
 .game-over-snackbar :deep(.v-snackbar__content) {
